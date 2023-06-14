@@ -1,3 +1,4 @@
+# Рязанов И. - импорт необходимых библиотек для работы с телеграмм-ботом, объявление доступа к телеграмм-боту и сервису
 import os
 import logging
 import requests
@@ -14,7 +15,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-
+# Мурзин И. - объявление состояний разговора для бота и создание 2-х кнопочных клавиатур
 (FIRST_CHOOSE, SECOND_CHOOSE, TYPING1, TYPING2, TYPING2A, TYPING3, TYPING3A, TYPING4, TYPING4A, TYPING5, TYPING5A,
  TYPING6, TYPING6A, TYPING7, TYPING7A, TYPING8, TYPING8A, TYPING9, TYPING9A, OUTPUT1, OUTPUT2, OUTPUT3) = range(22)
 
@@ -36,6 +37,7 @@ markup1 = ReplyKeyboardMarkup(reply_keyboard1, one_time_keyboard=True)
 args = []
 
 
+# Уразаев А. - реализация функции вывода для пользователя всех операций с расходниками, имеющихся в базе данных
 def all_operations():
     response = requests.get(f"{API_URL}/all_operations", timeout=7)
     if response:
@@ -47,6 +49,8 @@ def all_operations():
                           f"{operation['fin_volume']}, {operation['date_volume']}" for operation in operations])
 
 
+# Уразаев А. - реализация функции получения всех операций с расходниками в базе данных по определенным категориям:
+# # название расходника, единица его измерения, остаток на дату и сама дата
 def get_volume_consumables():
     url = f"{API_URL}/get_volume_consumables"
     response = requests.get(url, timeout=7)
@@ -56,6 +60,8 @@ def get_volume_consumables():
                           f"{operation['fin_volume']}, {operation['date_volume']}" for operation in operations])
 
 
+# Уразаев А. - реализация функции добавления новой операции с расходниками в базе данных,
+# # где отдельно присваивается значение каждому ее признаку
 def add_operation(
         consume, start_volume, unit_measure, name_employee,
         position_employee, num_taken, reason, fin_volume, date_volume):
@@ -66,6 +72,7 @@ def add_operation(
     return response
 
 
+# Федоренок Е. - реализация функции обновления (замены) характеристик операции с расходниками в базе данных
 def update_operation(
         id, consume=None, start_volume=None, unit_measure=None,
         name_employee=None, position_employee=None, num_taken=None,
@@ -94,12 +101,14 @@ def update_operation(
     return response
 
 
+# Федоренок Е. - реализация функции удаления операции с расходниками в базе данных, а также условие запуска сервиса
 def delete_operation(id):
     url = f"{API_URL}/delete_operation/{id}"
     response = requests.delete(url)
     return response
 
 
+# Федоренок Е. - реализация функции начала работы с телеграмм-ботом
 async def start(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat.id,
@@ -109,6 +118,7 @@ async def start(update, context):
     return FIRST_CHOOSE
 
 
+# Федоренок Е. - реализация функции вызова инструкции работы с телеграмм-ботом
 async def helping(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat.id, text="Functions of service:\n"
@@ -133,6 +143,7 @@ async def helping(update, context):
     return FIRST_CHOOSE
 
 
+# Пермякова Ю. - реализация функции возврата к главному меню телеграмм-бота: выбором между началом работы и инструкцией
 async def returning(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat.id,
@@ -142,6 +153,7 @@ async def returning(update, context):
     return FIRST_CHOOSE
 
 
+# Пермякова Ю. - реализация функции завершения работы телеграмм-бота (переносит к состоянию до команды /start)
 async def finish(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat.id, text="Thank you for using this service. Come back later!",
@@ -151,6 +163,7 @@ async def finish(update, context):
     return ConversationHandler.END
 
 
+# Пермякова Ю. - реализация функции перехода после начала работы к выбору необходимой для пользователя функции
 async def working(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat.id, text="Choose the most relevant function, which you want to activate:",
@@ -159,6 +172,7 @@ async def working(update, context):
     return SECOND_CHOOSE
 
 
+# Пермякова Ю. - реализация функции вывода для пользователя всех операций с расходниками, имеющихся в базе данных
 async def handle_all_operations(update, context):
     message_body = all_operations()
     if message_body:
@@ -173,6 +187,8 @@ async def handle_all_operations(update, context):
         return SECOND_CHOOSE
 
 
+# Пермякова Ю. - реализация функции получения всех операций с расходниками в базе данных по определенным категориям:
+# # название расходника, единица его измерения, остаток на дату и сама дата
 async def handle_get_volume_consumables(update, context):
     msg = get_volume_consumables()
     if msg:
@@ -187,6 +203,7 @@ async def handle_get_volume_consumables(update, context):
         return SECOND_CHOOSE
 
 
+# Рязанов И. - реализация функции записи в чат индекса операции (для обновления операции)
 async def in_id_oper(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input id of operation:"
@@ -194,6 +211,7 @@ async def in_id_oper(update, context):
     return TYPING1
 
 
+# Рязанов И. - реализация функции записи в чат индекса операции (для удаления операции)
 async def in_id_oper_del(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input id of operation:"
@@ -201,6 +219,7 @@ async def in_id_oper_del(update, context):
     return OUTPUT3
 
 
+# Рязанов И. - реализация функции записи в чат названия расходника и сохранения индекса (для обновления операции)
 async def in_cons_oper(update, context):
     id = update.message.text
     args.append(int(id))
@@ -210,6 +229,7 @@ async def in_cons_oper(update, context):
     return TYPING2
 
 
+# Рязанов И. - реализация функции записи в чат названия расходника (для добавления операции)
 async def in_cons_oper_add(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of consumable:"
@@ -217,6 +237,8 @@ async def in_cons_oper_add(update, context):
     return TYPING2A
 
 
+# Рязанов И. - реализация функции записи в чат начального объема расходника на дату и
+# сохранения названия (для обновления операции)
 async def in_fst_vol_oper(update, context):
     consume = update.message.text
     args.append(consume)
@@ -226,6 +248,8 @@ async def in_fst_vol_oper(update, context):
     return TYPING3
 
 
+# Рязанов И. - реализация функции записи в чат начального объема расходника на дату и
+# сохранения названия (для добавления операции)
 async def in_fst_vol_oper_add(update, context):
     consume = update.message.text
     args.append(consume)
@@ -235,6 +259,8 @@ async def in_fst_vol_oper_add(update, context):
     return TYPING3A
 
 
+# Рязанов И. - реализация функции записи в чат единицы измерения расходника и сохранения
+# начального объема (для обновления операции)
 async def in_meas_oper(update, context):
     start_value = update.message.text
     args.append(int(start_value))
@@ -244,6 +270,8 @@ async def in_meas_oper(update, context):
     return TYPING4
 
 
+# Рязанов И. - реализация функции записи в чат единицы измерения расходника и сохранения
+# начального объема (для добавления операции)
 async def in_meas_oper_add(update, context):
     start_value = update.message.text
     args.append(int(start_value))
@@ -253,6 +281,8 @@ async def in_meas_oper_add(update, context):
     return TYPING4A
 
 
+# Уразаев А. - реализация функции записи в чат имени работника, взявшего расходник, и сохранения
+# единицы измерения (для обновления операции)
 async def in_fio_empl_oper(update, context):
     unit_measure = update.message.text
     args.append(unit_measure)
@@ -262,6 +292,8 @@ async def in_fio_empl_oper(update, context):
     return TYPING5
 
 
+# Уразаев А. - реализация функции записи в чат имени работника, взявшего расходник, и сохранения
+# единицы измерения (для добавления операции)
 async def in_fio_empl_oper_add(update, context):
     unit_measure = update.message.text
     args.append(unit_measure)
@@ -271,6 +303,8 @@ async def in_fio_empl_oper_add(update, context):
     return TYPING5A
 
 
+# Уразаев А. - реализация функции записи в чат должности работника, взявшего расходник, и сохранения
+# имени сотрудника (для обновления операции)
 async def in_pos_empl_oper(update, context):
     name_employee = update.message.text
     args.append(name_employee)
@@ -280,6 +314,8 @@ async def in_pos_empl_oper(update, context):
     return TYPING6
 
 
+# Уразаев А. - реализация функции записи в чат должности работника, взявшего расходник, и сохранения
+# имени сотрудника (для добавления операции)
 async def in_pos_empl_oper_add(update, context):
     name_employee = update.message.text
     args.append(name_employee)
@@ -289,6 +325,8 @@ async def in_pos_empl_oper_add(update, context):
     return TYPING6A
 
 
+# Уразаев А. - реализация функции записи в чат объема расходника, взятого работником, и сохранения
+# должности сотрудника (для обновления операции)
 async def in_n_taken_oper(update, context):
     position_employee = update.message.text
     args.append(position_employee)
@@ -298,6 +336,8 @@ async def in_n_taken_oper(update, context):
     return TYPING7
 
 
+# Уразаев А. - реализация функции записи в чат объема расходника, взятого работником, и сохранения
+# должности сотрудника (для добавления операции)
 async def in_n_taken_oper_add(update, context):
     position_employee = update.message.text
     args.append(position_employee)
@@ -307,6 +347,8 @@ async def in_n_taken_oper_add(update, context):
     return TYPING7A
 
 
+# Уразаев А. - реализация функции записи в чат причины взятия расходника и сохранения
+# выбывшего объема расходника (для обновления операции)
 async def in_reas_oper(update, context):
     num_taken = update.message.text
     args.append(int(num_taken))
@@ -316,6 +358,8 @@ async def in_reas_oper(update, context):
     return TYPING8
 
 
+# Уразаев А. - реализация функции записи в чат причины взятия расходника и сохранения
+# выбывшего объема расходника (для добавления операции)
 async def in_reas_oper_add(update, context):
     num_taken = update.message.text
     args.append(int(num_taken))
@@ -325,6 +369,8 @@ async def in_reas_oper_add(update, context):
     return TYPING8A
 
 
+# Федоренко Е. - реализация функции записи в чат остатка расходника на дату и сохранения
+# причины взятия расходника (для обновления операции)
 async def in_fin_vol_oper(update, context):
     reason = update.message.text
     args.append(reason)
@@ -334,6 +380,8 @@ async def in_fin_vol_oper(update, context):
     return TYPING9
 
 
+# Федоренко Е. - реализация функции записи в чат остатка расходника на дату и сохранения
+# причины взятия расходника (для добавления операции)
 async def in_fin_vol_oper_add(update, context):
     reason = update.message.text
     args.append(reason)
@@ -343,6 +391,8 @@ async def in_fin_vol_oper_add(update, context):
     return TYPING9A
 
 
+# Федоренко Е. - реализация функции записи в чат даты совершения операции с расходником и сохранения
+# остатка расходника на дату (для обновления операции)
 async def in_dt_vol_oper(update, context):
     fin_volume = update.message.text
     args.append(int(fin_volume))
@@ -352,6 +402,8 @@ async def in_dt_vol_oper(update, context):
     return OUTPUT1
 
 
+# Федоренко Е. - реализация функции записи в чат даты совершения операции с расходником и сохранения
+# остатка расходника на дату (для добавления операции)
 async def in_dt_vol_oper_add(update, context):
     fin_volume = update.message.text
     args.append(int(fin_volume))
@@ -361,6 +413,8 @@ async def in_dt_vol_oper_add(update, context):
     return OUTPUT2
 
 
+# Пермякова Ю. - реализация функции сохранения даты совершения операции с расходником и добавления новой
+# операции с расходниками в базе данных, где отдельно присваивается значение каждому ее признаку
 async def handle_add_operation(update, context):
     date_volume = update.message.text
     args.append(date_volume)
@@ -381,6 +435,8 @@ async def handle_add_operation(update, context):
         return SECOND_CHOOSE
 
 
+# Рязанов И. - реализация функции сохранения даты совершения операции с расходником и обновления
+# (замены) характеристик операции с расходниками в базе данных
 async def handle_update_operation(update, context):
     date_volume = update.message.text
     args.append(date_volume)
@@ -401,6 +457,8 @@ async def handle_update_operation(update, context):
         return SECOND_CHOOSE
 
 
+# Уразаев А. - реализация функции сохранения индекса операции с расходником и удаления операции
+# с расходниками в базе данных
 async def handle_delete_operation(update, context):
     num = update.message.text
     args.append(int(num))
@@ -418,6 +476,8 @@ async def handle_delete_operation(update, context):
         return SECOND_CHOOSE
 
 
+# Мурзин И. - реализация функции обработчиков сообщений от пользователя телеграмм-ботом:
+# начало разговора, доступные состояния, в которые он может перейти, и условия его окончания
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     conv_handler = ConversationHandler(
