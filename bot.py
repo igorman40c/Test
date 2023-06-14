@@ -33,6 +33,9 @@ reply_keyboard1 = [
 markup1 = ReplyKeyboardMarkup(reply_keyboard1, one_time_keyboard=True)
 
 
+args = []
+
+
 def all_operations():
     response = requests.get(f"{API_URL}/all_operations", timeout=7)
     if response:
@@ -144,6 +147,7 @@ async def finish(update, context):
         chat_id=update.message.chat.id, text="Thank you for using this service. Come back later!",
         reply_markup=ReplyKeyboardRemove()
     )
+    args.clear()
     return ConversationHandler.END
 
 
@@ -200,7 +204,8 @@ async def in_id_oper_del(update, context):
 
 
 async def in_cons_oper(update, context):
-    context.id = update.message.text
+    id = update.message.text
+    args.append(int(id))
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of consumable:"
     )
@@ -215,7 +220,8 @@ async def in_cons_oper_add(update, context):
 
 
 async def in_fst_vol_oper(update, context):
-    context.consume = update.message.text
+    consume = update.message.text
+    args.append(consume)
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input initial volume of consumable on date:"
     )
@@ -223,7 +229,8 @@ async def in_fst_vol_oper(update, context):
 
 
 async def in_meas_oper(update, context):
-    context.start_value = update.message.text
+    start_value = update.message.text
+    args.append(int(start_value))
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input unit of measure for consumable:"
     )
@@ -231,7 +238,8 @@ async def in_meas_oper(update, context):
 
 
 async def in_fio_empl_oper(update, context):
-    context.unit_measure = update.message.text
+    unit_measure = update.message.text
+    args.append(unit_measure)
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of employee for operation:"
     )
@@ -239,7 +247,8 @@ async def in_fio_empl_oper(update, context):
 
 
 async def in_pos_empl_oper(update, context):
-    context.name_employee = update.message.text
+    name_employee = update.message.text
+    args.append(name_employee)
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input position of employee for operation:"
     )
@@ -247,7 +256,8 @@ async def in_pos_empl_oper(update, context):
 
 
 async def in_n_taken_oper(update, context):
-    context.position_employee = update.message.text
+    position_employee = update.message.text
+    args.append(position_employee)
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input taken volume of consumable of operation:"
     )
@@ -255,7 +265,8 @@ async def in_n_taken_oper(update, context):
 
 
 async def in_reas_oper(update, context):
-    context.num_taken = update.message.text
+    num_taken = update.message.text
+    args.append(int(num_taken))
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input reason of operation:"
     )
@@ -263,7 +274,8 @@ async def in_reas_oper(update, context):
 
 
 async def in_fin_vol_oper(update, context):
-    context.reason = update.message.text
+    reason = update.message.text
+    args.append(reason)
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input remaining volume of consumable on date:"
     )
@@ -271,7 +283,8 @@ async def in_fin_vol_oper(update, context):
 
 
 async def in_dt_vol_oper(update, context):
-    context.fin_volume = update.message.text
+    fin_volume = update.message.text
+    args.append(int(fin_volume))
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input date of operation:"
     )
@@ -279,47 +292,59 @@ async def in_dt_vol_oper(update, context):
 
 
 async def handle_add_operation(update, context):
-    context.date_volume = update.message.text
+    date_volume = update.message.text
+    args.append(date_volume)
+    (consume, start_value, unit_measure, name_employee, position_employee,
+     num_taken, reason, fin_value, data_val) = args
     if add_operation(
-            context.consume, context.start_value, context.unit_measure,
-            context.name_employee, context.position_employee, context.num_taken,
-            context.reason, context.fin_volume, context.date_volume):
+            consume, start_value, unit_measure, name_employee, position_employee,
+            num_taken, reason, fin_value, data_val):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation added successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
         )
+        args.clear()
         return SECOND_CHOOSE
     else:
         await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
+        args.clear()
         return SECOND_CHOOSE
 
 
 async def handle_update_operation(update, context):
-    context.date_volume = update.message.text
+    date_volume = update.message.text
+    args.append(date_volume)
+    (id, consume, start_value, unit_measure, name_employee, position_employee,
+     num_taken, reason, fin_value, data_val) = args
     if update_operation(
-            context.id, context.consume, context.start_value, context.unit_measure,
-            context.name_employee, context.position_employee, context.num_taken,
-            context.reason, context.fin_volume, context.date_volume):
+            id, consume, start_value, unit_measure, name_employee, position_employee,
+            num_taken, reason, fin_value, data_val):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation updated successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
         )
+        args.clear()
         return SECOND_CHOOSE
     else:
         await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
+        args.clear()
         return SECOND_CHOOSE
 
 
 async def handle_delete_operation(update, context):
-    context.id = update.message.text
-    if delete_operation(context.id):
-        context.bot.send_message(
+    num = update.message.text
+    args.append(int(num))
+    id = args
+    if delete_operation(id):
+        await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation deleted successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
         )
+        args.clear()
         return SECOND_CHOOSE
     else:
         await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
+        args.clear()
         return SECOND_CHOOSE
 
 
