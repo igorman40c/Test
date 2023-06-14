@@ -97,7 +97,7 @@ def delete_operation(id):
     return response
 
 
-async def start(update):
+async def start(update, context):
     await update.message.reply_text(
         "Hello! Welcome to service about operations with consumables. "
         "You can open the service or read an instruction about functions of service",
@@ -106,7 +106,7 @@ async def start(update):
     return FIRST_CHOOSE
 
 
-async def helping(update):
+async def helping(update, context):
     await update.message.reply_text(
         "Functions of service:\n"
         "1) See all operations with consumables - it allows to see all database: title of consumable; "
@@ -130,7 +130,7 @@ async def helping(update):
     return FIRST_CHOOSE
 
 
-async def returning(update):
+async def returning(update, context):
     await update.message.reply_text(
         "Hello again! You can open the service or read an instruction about functions of service",
         reply_markup=markup
@@ -138,7 +138,7 @@ async def returning(update):
     return FIRST_CHOOSE
 
 
-async def finish(update):
+async def finish(update, context):
     await update.message.reply_text(
         "Thank you for using this service. Come back later!",
         reply_markup=ReplyKeyboardRemove()
@@ -146,7 +146,7 @@ async def finish(update):
     return ConversationHandler.END
 
 
-async def working(update):
+async def working(update, context):
     await update.message.reply_text(
         "Choose the most relevant function, which you want to activate:",
         reply_markup=markup1
@@ -154,7 +154,7 @@ async def working(update):
     return SECOND_CHOOSE
 
 
-async def handle_all_operations(update):
+async def handle_all_operations(update, context):
     message_body = all_operations()
     if message_body:
         await update.message.reply_text(message_body, "Result was received! What else do you want to do?",
@@ -165,7 +165,7 @@ async def handle_all_operations(update):
         return SECOND_CHOOSE
 
 
-async def handle_get_volume_consumables(update):
+async def handle_get_volume_consumables(update, context):
     msg = get_volume_consumables()
     if msg:
         await update.message.reply_text(msg, "Result was received! What else do you want to do?",
@@ -176,57 +176,57 @@ async def handle_get_volume_consumables(update):
         return SECOND_CHOOSE
 
 
-async def input_id_operation(update):
+async def input_id_operation(update, context):
     await update.message.reply_text("Input id of operation:")
     return TYPING1
 
 
-async def input_consumable_operation(update):
+async def input_consumable_operation(update, context):
     await update.message.reply_text("Input name of consumable:")
     return TYPING2
 
 
-async def input_start_volume_operation(update):
+async def input_start_volume_operation(update, context):
     await update.message.reply_text("Input initial volume of consumable on date:")
     return TYPING3
 
 
-async def input_unit_measure_operation(update):
+async def input_unit_measure_operation(update, context):
     await update.message.reply_text("Input unit of measure for consumable:")
     return TYPING4
 
 
-async def input_name_employee_operation(update):
+async def input_name_employee_operation(update, context):
     await update.message.reply_text("Input name of employee for operation:")
     return TYPING5
 
 
-async def input_position_employee_operation(update):
+async def input_position_employee_operation(update, context):
     await update.message.reply_text("Input position of employee for operation:")
     return TYPING6
 
 
-async def input_num_taken_operation(update):
+async def input_num_taken_operation(update, context):
     await update.message.reply_text("Input taken volume of consumable of operation:")
     return TYPING7
 
 
-async def input_reason_operation(update):
+async def input_reason_operation(update, context):
     await update.message.reply_text("Input reason of operation:")
     return TYPING8
 
 
-async def input_fin_volume_operation(update):
+async def input_fin_volume_operation(update, context):
     await update.message.reply_text("Input remaining volume of consumable on date:")
     return TYPING9
 
 
-async def input_data_volume_operation(update):
+async def input_data_volume_operation(update, context):
     await update.message.reply_text("Input date of operation:")
     return OUTPUT
 
 
-async def handle_add_operation(update):
+async def handle_add_operation(update, context):
     if add_operation(
             input_consumable_operation(), input_start_volume_operation(), input_unit_measure_operation(),
             input_name_employee_operation(), input_position_employee_operation(), input_num_taken_operation(),
@@ -239,7 +239,7 @@ async def handle_add_operation(update):
         return SECOND_CHOOSE
 
 
-async def handle_update_operation(update):
+async def handle_update_operation(update, context):
     if update_operation(
             input_id_operation(), input_consumable_operation(), input_start_volume_operation(),
             input_unit_measure_operation(), input_name_employee_operation(), input_position_employee_operation(),
@@ -253,7 +253,7 @@ async def handle_update_operation(update):
         return SECOND_CHOOSE
 
 
-async def handle_delete_operation(update):
+async def handle_delete_operation(update, context):
     if delete_operation(input_id_operation()):
         await update.message.reply_text("Operation deleted successfully, result was received! "
                                         "What else do you want to do?", reply_markup=markup1)
