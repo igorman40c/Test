@@ -159,7 +159,7 @@ async def handle_all_operations(update, context):
     message_body = all_operations()
     if message_body:
         await context.bot.send_message(
-            chat_id=update.message.chat.id, text=f"{message_body}\nResult was received! What else do you want to do?",
+            chat_id=update.message.chat.id, text=(message_body, "\nResult was received! What else do you want to do?"),
             reply_markup=markup1
         )
         return SECOND_CHOOSE
@@ -174,7 +174,7 @@ async def handle_get_volume_consumables(update, context):
     msg = get_volume_consumables()
     if msg:
         await context.bot.send_message(
-            chat_id=update.message.chat.id, text=f"{msg}\nResult was received! What else do you want to do?",
+            chat_id=update.message.chat.id, text=(msg, "\nResult was received! What else do you want to do?"),
             reply_markup=markup1
         )
         return SECOND_CHOOSE
