@@ -164,7 +164,9 @@ async def handle_all_operations(update, context):
         )
         return SECOND_CHOOSE
     else:
-        await update.message.reply_text("Error, maybe database is empty", reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Error, maybe database is empty", reply_markup=markup1
+        )
         return SECOND_CHOOSE
 
 
@@ -177,7 +179,9 @@ async def handle_get_volume_consumables(update, context):
         )
         return SECOND_CHOOSE
     else:
-        await update.message.reply_text("Error, maybe database is empty", reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Error, maybe database is empty", reply_markup=markup1
+        )
         return SECOND_CHOOSE
 
 
