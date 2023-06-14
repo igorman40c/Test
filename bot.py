@@ -98,17 +98,17 @@ def delete_operation(id):
 
 
 async def start(update, context):
-    await update.message.reply_text(
-        "Hello! Welcome to service about operations with consumables. "
-        "You can open the service or read an instruction about functions of service",
-        reply_markup=markup
+    await context.bot.send_message(
+        chat_id=update.message.chat.id,
+        text="Hello! Welcome to service about operations with consumables. "
+             "You can open the service or read an instruction about functions of service", reply_markup=markup
     )
     return FIRST_CHOOSE
 
 
 async def helping(update, context):
-    await update.message.reply_text(
-        "Functions of service:\n"
+    await context.bot.send_message(
+        chat_id=update.message.chat.id, text="Functions of service:\n"
         "1) See all operations with consumables - it allows to see all database: title of consumable; "
         "its initial volume on date; unit of its measure; name of employee, who took the consumable; "
         "position of employee; volume of consumable, taken by him; reason of employee's operation; "
@@ -131,24 +131,25 @@ async def helping(update, context):
 
 
 async def returning(update, context):
-    await update.message.reply_text(
-        "Hello again! You can open the service or read an instruction about functions of service",
+    await context.bot.send_message(
+        chat_id=update.message.chat.id,
+        text="Hello again! You can open the service or read an instruction about functions of service",
         reply_markup=markup
     )
     return FIRST_CHOOSE
 
 
 async def finish(update, context):
-    await update.message.reply_text(
-        "Thank you for using this service. Come back later!",
+    await context.bot.send_message(
+        chat_id=update.message.chat.id, text="Thank you for using this service. Come back later!",
         reply_markup=ReplyKeyboardRemove()
     )
     return ConversationHandler.END
 
 
 async def working(update, context):
-    await update.message.reply_text(
-        "Choose the most relevant function, which you want to activate:",
+    await context.bot.send_message(
+        chat_id=update.message.chat.id, text="Choose the most relevant function, which you want to activate:",
         reply_markup=markup1
     )
     return SECOND_CHOOSE
@@ -157,8 +158,10 @@ async def working(update, context):
 async def handle_all_operations(update, context):
     message_body = all_operations()
     if message_body:
-        await update.message.reply_text(message_body, "Result was received! What else do you want to do?",
-                                        reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text=f"{message_body}\nResult was received! What else do you want to do?",
+            reply_markup=markup1
+        )
         return SECOND_CHOOSE
     else:
         await update.message.reply_text("Error, maybe database is empty", reply_markup=markup1)
@@ -168,8 +171,10 @@ async def handle_all_operations(update, context):
 async def handle_get_volume_consumables(update, context):
     msg = get_volume_consumables()
     if msg:
-        await update.message.reply_text(msg, "Result was received! What else do you want to do?",
-                                        reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text=f"{msg}\nResult was received! What else do you want to do?",
+            reply_markup=markup1
+        )
         return SECOND_CHOOSE
     else:
         await update.message.reply_text("Error, maybe database is empty", reply_markup=markup1)
@@ -177,52 +182,72 @@ async def handle_get_volume_consumables(update, context):
 
 
 async def input_id_operation(update, context):
-    await update.message.reply_text("Input id of operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input id of operation:"
+    )
     return TYPING1
 
 
 async def input_consumable_operation(update, context):
-    await update.message.reply_text("Input name of consumable:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input name of consumable:"
+    )
     return TYPING2
 
 
 async def input_start_volume_operation(update, context):
-    await update.message.reply_text("Input initial volume of consumable on date:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input initial volume of consumable on date:"
+    )
     return TYPING3
 
 
 async def input_unit_measure_operation(update, context):
-    await update.message.reply_text("Input unit of measure for consumable:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input unit of measure for consumable:"
+    )
     return TYPING4
 
 
 async def input_name_employee_operation(update, context):
-    await update.message.reply_text("Input name of employee for operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input name of employee for operation:"
+    )
     return TYPING5
 
 
 async def input_position_employee_operation(update, context):
-    await update.message.reply_text("Input position of employee for operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input position of employee for operation:"
+    )
     return TYPING6
 
 
 async def input_num_taken_operation(update, context):
-    await update.message.reply_text("Input taken volume of consumable of operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input taken volume of consumable of operation:"
+    )
     return TYPING7
 
 
 async def input_reason_operation(update, context):
-    await update.message.reply_text("Input reason of operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input reason of operation:"
+    )
     return TYPING8
 
 
 async def input_fin_volume_operation(update, context):
-    await update.message.reply_text("Input remaining volume of consumable on date:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input remaining volume of consumable on date:"
+    )
     return TYPING9
 
 
 async def input_data_volume_operation(update, context):
-    await update.message.reply_text("Input date of operation:")
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input date of operation:"
+    )
     return OUTPUT
 
 
@@ -231,11 +256,13 @@ async def handle_add_operation(update, context):
             input_consumable_operation(), input_start_volume_operation(), input_unit_measure_operation(),
             input_name_employee_operation(), input_position_employee_operation(), input_num_taken_operation(),
             input_reason_operation(), input_fin_volume_operation(), input_data_volume_operation()):
-        await update.message.reply_text("Operation added successfully, result was received! "
-                                        "What else do you want to do?", reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Operation added successfully, result was received! "
+                                                 "What else do you want to do?", reply_markup=markup1
+        )
         return SECOND_CHOOSE
     else:
-        await update.message.reply_text("Error", reply_markup=markup1)
+        await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
         return SECOND_CHOOSE
 
 
@@ -245,21 +272,25 @@ async def handle_update_operation(update, context):
             input_unit_measure_operation(), input_name_employee_operation(), input_position_employee_operation(),
             input_num_taken_operation(), input_reason_operation(), input_fin_volume_operation(),
             input_data_volume_operation()):
-        await update.message.reply_text("Operation updated successfully, result was received! "
-                                        "What else do you want to do?", reply_markup=markup1)
+        await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Operation updated successfully, result was received! "
+                                                 "What else do you want to do?", reply_markup=markup1
+        )
         return SECOND_CHOOSE
     else:
-        await update.message.reply_text("Error", reply_markup=markup1)
+        await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
         return SECOND_CHOOSE
 
 
 async def handle_delete_operation(update, context):
     if delete_operation(input_id_operation()):
-        await update.message.reply_text("Operation deleted successfully, result was received! "
-                                        "What else do you want to do?", reply_markup=markup1)
+        context.bot.send_message(
+            chat_id=update.message.chat.id, text="Operation deleted successfully, result was received! "
+                                                 "What else do you want to do?", reply_markup=markup1
+        )
         return SECOND_CHOOSE
     else:
-        await update.message.reply_text("Error", reply_markup=markup1)
+        await context.bot.send_message(chat_id=update.message.chat.id, text="Error", reply_markup=markup1)
         return SECOND_CHOOSE
 
 
