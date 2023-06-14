@@ -1,14 +1,16 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc, desc
+from sqlalchemy import exc, desc, create_engine
 import os
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{os.environ['POSTGRES_USER']}" \
                                         f":{os.environ['POSTGRES_PASSWORD']}" \
                                         f"@{os.environ['POSTGRES_HOST']}:5432/{os.environ['POSTGRES_DB']}"
+engine = create_engine(f"postgresql://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}"
+                       f"@{os.environ['POSTGRES_HOST']}:5432/{os.environ['POSTGRES_DB']}",
+                       pool_pre_ping=True)
 db = SQLAlchemy(app)
 
 
