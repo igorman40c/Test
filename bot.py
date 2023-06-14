@@ -41,7 +41,7 @@ def all_operations():
                           f"{operation['start_volume']}, {operation['unit_measure']}, "
                           f"{operation['name_employee']}, {operation['position_employee']}, "
                           f"{operation['num_taken']}, {operation['reason']}, "
-                          f"{operation['fin_volume']}, {operation['data_volume']}" for operation in operations])
+                          f"{operation['fin_volume']}, {operation['date_volume']}" for operation in operations])
 
 
 def get_volume_consumables():
@@ -50,23 +50,23 @@ def get_volume_consumables():
     if response:
         operations = response.json()
         return "\n".join([f"{operation['consume']}, {operation['unit_measure']}, "
-                          f"{operation['fin_volume']}, {operation['data_volume']}" for operation in operations])
+                          f"{operation['fin_volume']}, {operation['date_volume']}" for operation in operations])
 
 
 def add_operation(
         consume, start_volume, unit_measure, name_employee,
-        position_employee, num_taken, reason, fin_volume, data_volume):
+        position_employee, num_taken, reason, fin_volume, date_volume):
     response = requests.post(f"{API_URL}/add_operation", json={
         'consume': consume, 'start_volume': start_volume, 'unit_measure': unit_measure,
         'name_employee': name_employee, 'position_employee': position_employee, 'num_taken': num_taken,
-        'reason': reason, 'fin_volume': fin_volume, 'data_volume': data_volume})
+        'reason': reason, 'fin_volume': fin_volume, 'date_volume': date_volume})
     return response
 
 
 def update_operation(
         id, consume=None, start_volume=None, unit_measure=None,
         name_employee=None, position_employee=None, num_taken=None,
-        reason=None, fin_volume=None, data_volume=None):
+        reason=None, fin_volume=None, date_volume=None):
     url = f"{API_URL}/update_operation/{id}"
     data = {}
     if consume:
@@ -85,8 +85,8 @@ def update_operation(
         data['reason'] = reason
     if fin_volume:
         data['fin_volume'] = fin_volume
-    if data_volume:
-        data['data_volume'] = data_volume
+    if date_volume:
+        data['date_volume'] = date_volume
     response = requests.put(url, json=data)
     return response
 
@@ -124,7 +124,7 @@ async def helping(update, context):
         "<position of employee>, <volume of taken consumables>, <reason of operation>, "
         "<remaining volume on date>, <date of operation>, which you input.\n"
         "5) Delete operation with consumables - it allows to delete operation with <id>, which you input.\n"
-        "If you want to continue working wih service, then you should activate command '/start' again.",
+        "If you want to continue working wih service, then you should activate button 'Open service' again.",
         reply_markup=markup
     )
     return FIRST_CHOOSE
@@ -185,70 +185,93 @@ async def handle_get_volume_consumables(update, context):
         return SECOND_CHOOSE
 
 
-async def input_id_operation(update, context):
+async def in_id_oper(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input id of operation:"
     )
     return TYPING1
 
 
-async def input_consumable_operation(update, context):
+async def in_id_oper_del(update, context):
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input id of operation:"
+    )
+    return OUTPUT
+
+
+async def in_cons_oper(update, context):
+    context.id = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of consumable:"
     )
     return TYPING2
 
 
-async def input_start_volume_operation(update, context):
+async def in_cons_oper_add(update, context):
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input name of consumable:"
+    )
+    return TYPING2
+
+
+async def in_fst_vol_oper(update, context):
+    context.consume = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input initial volume of consumable on date:"
     )
     return TYPING3
 
 
-async def input_unit_measure_operation(update, context):
+async def in_meas_oper(update, context):
+    context.start_value = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input unit of measure for consumable:"
     )
     return TYPING4
 
 
-async def input_name_employee_operation(update, context):
+async def in_fio_empl_oper(update, context):
+    context.unit_measure = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of employee for operation:"
     )
     return TYPING5
 
 
-async def input_position_employee_operation(update, context):
+async def in_pos_empl_oper(update, context):
+    context.name_employee = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input position of employee for operation:"
     )
     return TYPING6
 
 
-async def input_num_taken_operation(update, context):
+async def in_n_taken_oper(update, context):
+    context.position_employee = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input taken volume of consumable of operation:"
     )
     return TYPING7
 
 
-async def input_reason_operation(update, context):
+async def in_reas_oper(update, context):
+    context.num_taken = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input reason of operation:"
     )
     return TYPING8
 
 
-async def input_fin_volume_operation(update, context):
+async def in_fin_vol_oper(update, context):
+    context.reason = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input remaining volume of consumable on date:"
     )
     return TYPING9
 
 
-async def input_data_volume_operation(update, context):
+async def in_dt_vol_oper(update, context):
+    context.fin_volume = update.message.text
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input date of operation:"
     )
@@ -256,10 +279,11 @@ async def input_data_volume_operation(update, context):
 
 
 async def handle_add_operation(update, context):
+    context.date_volume = update.message.text
     if add_operation(
-            input_consumable_operation(), input_start_volume_operation(), input_unit_measure_operation(),
-            input_name_employee_operation(), input_position_employee_operation(), input_num_taken_operation(),
-            input_reason_operation(), input_fin_volume_operation(), input_data_volume_operation()):
+            context.consume, context.start_value, context.unit_measure,
+            context.name_employee, context.position_employee, context.num_taken,
+            context.reason, context.fin_volume, context.date_volume):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation added successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
@@ -271,11 +295,11 @@ async def handle_add_operation(update, context):
 
 
 async def handle_update_operation(update, context):
+    context.date_volume = update.message.text
     if update_operation(
-            input_id_operation(), input_consumable_operation(), input_start_volume_operation(),
-            input_unit_measure_operation(), input_name_employee_operation(), input_position_employee_operation(),
-            input_num_taken_operation(), input_reason_operation(), input_fin_volume_operation(),
-            input_data_volume_operation()):
+            context.id, context.consume, context.start_value, context.unit_measure,
+            context.name_employee, context.position_employee, context.num_taken,
+            context.reason, context.fin_volume, context.date_volume):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation updated successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
@@ -287,7 +311,8 @@ async def handle_update_operation(update, context):
 
 
 async def handle_delete_operation(update, context):
-    if delete_operation(input_id_operation()):
+    context.id = update.message.text
+    if delete_operation(context.id):
         context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation deleted successfully, result was received! "
                                                  "What else do you want to do?", reply_markup=markup1
@@ -310,37 +335,37 @@ def main():
             SECOND_CHOOSE: [
                 MessageHandler(filters.Regex("^See all operations with consumables$"), handle_all_operations),
                 MessageHandler(filters.Regex("^Get some info about consumables$"), handle_get_volume_consumables),
-                MessageHandler(filters.Regex("^Add operation with consumables$"), input_consumable_operation),
-                MessageHandler(filters.Regex("^Update operation with consumables$"), input_id_operation),
-                MessageHandler(filters.Regex("^Delete operation with consumables$"), input_id_operation),
+                MessageHandler(filters.Regex("^Add operation with consumables$"), in_cons_oper_add),
+                MessageHandler(filters.Regex("^Update operation with consumables$"), in_id_oper),
+                MessageHandler(filters.Regex("^Delete operation with consumables$"), in_id_oper_del),
                 MessageHandler(filters.Regex("^Return to start$"), returning)
             ],
             TYPING1: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_consumable_operation),
+                MessageHandler(filters.TEXT, in_cons_oper)
             ],
             TYPING2: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_start_volume_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fst_vol_oper),
             ],
             TYPING3: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_unit_measure_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_meas_oper),
             ],
             TYPING4: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_name_employee_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fio_empl_oper),
             ],
             TYPING5: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_position_employee_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_pos_empl_oper),
             ],
             TYPING6: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_num_taken_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_n_taken_oper),
             ],
             TYPING7: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_reason_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_reas_oper),
             ],
             TYPING8: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_fin_volume_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fin_vol_oper),
             ],
             TYPING9: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, input_data_volume_operation),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, in_dt_vol_oper),
             ],
             OUTPUT: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_add_operation),

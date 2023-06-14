@@ -24,11 +24,11 @@ class Operation(db.Model):
     num_taken = db.Column(db.Integer)
     reason = db.Column(db.String(50))
     fin_volume = db.Column(db.Integer)
-    data_volume = db.Column(db.String(50))
+    date_volume = db.Column(db.String(50))
 
     def __init__(self, consume, start_volume, unit_measure,
                  name_employee, position_employee, num_taken,
-                 reason, fin_volume, data_volume):
+                 reason, fin_volume, date_volume):
         self.consume = consume
         self.start_volume = start_volume
         self.unit_measure = unit_measure
@@ -37,7 +37,7 @@ class Operation(db.Model):
         self.num_taken = num_taken
         self.reason = reason
         self.fin_volume = fin_volume
-        self.data_volume = data_volume
+        self.date_volume = date_volume
 
 
 with app.app_context():
@@ -47,7 +47,7 @@ with app.app_context():
 @app.route('/all_operations')
 def all_operations():
     try:
-        operations = Operation.query.order_by(desc(Operation.data_volume)).all()
+        operations = Operation.query.order_by(desc(Operation.date_volume)).all()
         result = []
         for operation in operations:
             data = {
@@ -60,7 +60,7 @@ def all_operations():
                 'num_taken': operation.num_taken,
                 'reason': operation.reason,
                 'fin_volume': operation.fin_volume,
-                'data_volume': operation.data_volume
+                'date_volume': operation.date_volume
             }
             result.append(data)
         return jsonify(result)
@@ -72,14 +72,14 @@ def all_operations():
 @app.route('/get_volume_consumables')
 def get_volume_consumables():
     try:
-        operations = Operation.query.order_by(Operation.consume, desc(Operation.data_volume)).all()
+        operations = Operation.query.order_by(Operation.consume, desc(Operation.date_volume)).all()
         result = []
         for operation in operations:
             data = {
                 'consume': operation.consume,
                 'unit_measure': operation.unit_measure,
                 'fin_volume': operation.fin_volume,
-                'data_volume': operation.data_volume
+                'date_volume': operation.date_volume
             }
             result.append(data)
         return jsonify(result)
@@ -99,11 +99,11 @@ def add_operation():
         num_taken = request.json['num_taken']
         reason = request.json['reason']
         fin_volume = request.json['fin_volume']
-        data_volume = request.json['data_volume']
+        date_volume = request.json['date_volume']
         operation = Operation(
             consume=consume, start_volume=start_volume, unit_measure=unit_measure,
             name_employee=name_employee, position_employee=position_employee,
-            num_taken=num_taken, reason=reason, fin_volume=fin_volume, data_volume=data_volume)
+            num_taken=num_taken, reason=reason, fin_volume=fin_volume, date_volume=date_volume)
         db.session.add(operation)
         db.session.commit()
         return jsonify({'message': 'Operation added successfully'})
@@ -126,7 +126,7 @@ def update_operation(id):
         num_taken = request.json['num_taken']
         reason = request.json['reason']
         fin_volume = request.json['fin_volume']
-        data_volume = request.json['data_volume']
+        date_volume = request.json['date_volume']
         operation.consume = consume
         operation.start_volume = start_volume
         operation.unit_measure = unit_measure
@@ -135,7 +135,7 @@ def update_operation(id):
         operation.num_taken = num_taken
         operation.reason = reason
         operation.fin_volume = fin_volume
-        operation.data_volume = data_volume
+        operation.date_volume = date_volume
         db.session.commit()
         return jsonify({'message': 'Operation updated successfully'})
     except exc.SQLAlchemyError as e:
