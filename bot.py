@@ -34,7 +34,7 @@ markup1 = ReplyKeyboardMarkup(reply_keyboard1, one_time_keyboard=True)
 
 
 def all_operations():
-    response = requests.get(f"{API_URL}/all_operations")
+    response = requests.get(f"{API_URL}/all_operations", timeout=7)
     if response:
         operations = response.json()
         return "\n".join([f"{operation['id']}, {operation['consume']}, "
@@ -46,7 +46,7 @@ def all_operations():
 
 def get_volume_consumables():
     url = f"{API_URL}/get_volume_consumables"
-    response = requests.get(url)
+    response = requests.get(url, timeout=7)
     if response:
         operations = response.json()
         return "\n".join([f"{operation['consume']}, {operation['unit_measure']}, "
