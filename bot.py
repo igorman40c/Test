@@ -15,8 +15,8 @@ logging.basicConfig(
 )
 
 
-(FIRST_CHOOSE, SECOND_CHOOSE, TYPING1, TYPING2, TYPING3, TYPING4, TYPING5, TYPING6, TYPING7,
- TYPING8, TYPING9, OUTPUT) = range(12)
+(FIRST_CHOOSE, SECOND_CHOOSE, TYPING1, TYPING2, TYPING2A, TYPING3, TYPING3A, TYPING4, TYPING4A, TYPING5, TYPING5A,
+ TYPING6, TYPING6A, TYPING7, TYPING7A, TYPING8, TYPING8A, TYPING9, TYPING9A, OUTPUT1, OUTPUT2, OUTPUT3) = range(14)
 
 
 reply_keyboard = [
@@ -163,8 +163,7 @@ async def handle_all_operations(update, context):
     message_body = all_operations()
     if message_body:
         await context.bot.send_message(
-            chat_id=update.message.chat.id, text=(message_body, "\nResult was received! What else do you want to do?"),
-            reply_markup=markup1
+            chat_id=update.message.chat.id, text=message_body, reply_markup=markup1
         )
         return SECOND_CHOOSE
     else:
@@ -178,8 +177,7 @@ async def handle_get_volume_consumables(update, context):
     msg = get_volume_consumables()
     if msg:
         await context.bot.send_message(
-            chat_id=update.message.chat.id, text=(msg, "\nResult was received! What else do you want to do?"),
-            reply_markup=markup1
+            chat_id=update.message.chat.id, text=msg, reply_markup=markup1
         )
         return SECOND_CHOOSE
     else:
@@ -200,7 +198,7 @@ async def in_id_oper_del(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input id of operation:"
     )
-    return OUTPUT
+    return OUTPUT3
 
 
 async def in_cons_oper(update, context):
@@ -216,7 +214,7 @@ async def in_cons_oper_add(update, context):
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input name of consumable:"
     )
-    return TYPING2
+    return TYPING2A
 
 
 async def in_fst_vol_oper(update, context):
@@ -228,6 +226,15 @@ async def in_fst_vol_oper(update, context):
     return TYPING3
 
 
+async def in_fst_vol_oper_add(update, context):
+    consume = update.message.text
+    args.append(consume)
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input initial volume of consumable on date:"
+    )
+    return TYPING3A
+
+
 async def in_meas_oper(update, context):
     start_value = update.message.text
     args.append(int(start_value))
@@ -235,6 +242,15 @@ async def in_meas_oper(update, context):
             chat_id=update.message.chat.id, text="Input unit of measure for consumable:"
     )
     return TYPING4
+
+
+async def in_meas_oper_add(update, context):
+    start_value = update.message.text
+    args.append(int(start_value))
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input unit of measure for consumable:"
+    )
+    return TYPING4A
 
 
 async def in_fio_empl_oper(update, context):
@@ -246,6 +262,15 @@ async def in_fio_empl_oper(update, context):
     return TYPING5
 
 
+async def in_fio_empl_oper_add(update, context):
+    unit_measure = update.message.text
+    args.append(unit_measure)
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input name of employee for operation:"
+    )
+    return TYPING5A
+
+
 async def in_pos_empl_oper(update, context):
     name_employee = update.message.text
     args.append(name_employee)
@@ -253,6 +278,15 @@ async def in_pos_empl_oper(update, context):
             chat_id=update.message.chat.id, text="Input position of employee for operation:"
     )
     return TYPING6
+
+
+async def in_pos_empl_oper_add(update, context):
+    name_employee = update.message.text
+    args.append(name_employee)
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input position of employee for operation:"
+    )
+    return TYPING6A
 
 
 async def in_n_taken_oper(update, context):
@@ -264,6 +298,15 @@ async def in_n_taken_oper(update, context):
     return TYPING7
 
 
+async def in_n_taken_oper_add(update, context):
+    position_employee = update.message.text
+    args.append(position_employee)
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input taken volume of consumable of operation:"
+    )
+    return TYPING7A
+
+
 async def in_reas_oper(update, context):
     num_taken = update.message.text
     args.append(int(num_taken))
@@ -271,6 +314,15 @@ async def in_reas_oper(update, context):
             chat_id=update.message.chat.id, text="Input reason of operation:"
     )
     return TYPING8
+
+
+async def in_reas_oper_add(update, context):
+    num_taken = update.message.text
+    args.append(int(num_taken))
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input reason of operation:"
+    )
+    return TYPING8A
 
 
 async def in_fin_vol_oper(update, context):
@@ -282,13 +334,31 @@ async def in_fin_vol_oper(update, context):
     return TYPING9
 
 
+async def in_fin_vol_oper_add(update, context):
+    reason = update.message.text
+    args.append(reason)
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input remaining volume of consumable on date:"
+    )
+    return TYPING9A
+
+
 async def in_dt_vol_oper(update, context):
     fin_volume = update.message.text
     args.append(int(fin_volume))
     await context.bot.send_message(
             chat_id=update.message.chat.id, text="Input date of operation:"
     )
-    return OUTPUT
+    return OUTPUT1
+
+
+async def in_dt_vol_oper_add(update, context):
+    fin_volume = update.message.text
+    args.append(int(fin_volume))
+    await context.bot.send_message(
+            chat_id=update.message.chat.id, text="Input date of operation:"
+    )
+    return OUTPUT2
 
 
 async def handle_add_operation(update, context):
@@ -365,38 +435,26 @@ def main():
                 MessageHandler(filters.Regex("^Delete operation with consumables$"), in_id_oper_del),
                 MessageHandler(filters.Regex("^Return to start$"), returning)
             ],
-            TYPING1: [
-                MessageHandler(filters.TEXT, in_cons_oper)
-            ],
-            TYPING2: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fst_vol_oper),
-            ],
-            TYPING3: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_meas_oper),
-            ],
-            TYPING4: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fio_empl_oper),
-            ],
-            TYPING5: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_pos_empl_oper),
-            ],
-            TYPING6: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_n_taken_oper),
-            ],
-            TYPING7: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_reas_oper),
-            ],
-            TYPING8: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_fin_vol_oper),
-            ],
-            TYPING9: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, in_dt_vol_oper),
-            ],
-            OUTPUT: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_add_operation),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_update_operation),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_delete_operation)
-            ]
+            TYPING1: [MessageHandler(filters.TEXT, in_cons_oper)],
+            TYPING2: [MessageHandler(filters.TEXT, in_fst_vol_oper)],
+            TYPING2A: [MessageHandler(filters.TEXT, in_fst_vol_oper_add)],
+            TYPING3: [MessageHandler(filters.TEXT, in_meas_oper)],
+            TYPING3A: [MessageHandler(filters.TEXT, in_meas_oper_add)],
+            TYPING4: [MessageHandler(filters.TEXT, in_fio_empl_oper)],
+            TYPING4A: [MessageHandler(filters.TEXT, in_fio_empl_oper_add)],
+            TYPING5: [MessageHandler(filters.TEXT, in_pos_empl_oper)],
+            TYPING5A: [MessageHandler(filters.TEXT, in_pos_empl_oper_add)],
+            TYPING6: [MessageHandler(filters.TEXT, in_n_taken_oper)],
+            TYPING6A: [MessageHandler(filters.TEXT, in_n_taken_oper_add)],
+            TYPING7: [MessageHandler(filters.TEXT, in_reas_oper)],
+            TYPING7A: [MessageHandler(filters.TEXT, in_reas_oper_add)],
+            TYPING8: [MessageHandler(filters.TEXT, in_fin_vol_oper)],
+            TYPING8A: [MessageHandler(filters.TEXT, in_fin_vol_oper_add)],
+            TYPING9: [MessageHandler(filters.TEXT, in_dt_vol_oper)],
+            TYPING9A: [MessageHandler(filters.TEXT, in_dt_vol_oper_add)],
+            OUTPUT1: [MessageHandler(filters.TEXT, handle_update_operation)],
+            OUTPUT2: [MessageHandler(filters.TEXT, handle_add_operation)],
+            OUTPUT3: [MessageHandler(filters.TEXT, handle_delete_operation)]
         },
         fallbacks=[MessageHandler(filters.Regex("^Finish the session$"), finish)]
     )
