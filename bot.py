@@ -462,7 +462,7 @@ async def handle_update_operation(update, context):
 async def handle_delete_operation(update, context):
     num = update.message.text
     args.append(int(num))
-    id = args
+    id = args[0]
     if delete_operation(id):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation deleted successfully, result was received! "
