@@ -460,9 +460,9 @@ async def handle_update_operation(update, context):
 # Уразаев А. - реализация функции сохранения индекса операции с расходником и удаления операции
 # с расходниками в базе данных
 async def handle_delete_operation(update, context):
-    num = update.message.text
-    args.append(int(num))
-    id = args[0]
+    id = update.message.text
+    args.append(int(id))
+    id = args.pop(0)
     if delete_operation(id):
         await context.bot.send_message(
             chat_id=update.message.chat.id, text="Operation deleted successfully, result was received! "
